@@ -12,9 +12,11 @@ function Navbar() {
       <Link style={{ color: "#F97316", fontWeight: "bold" }} to="/students">
         Students
       </Link>
-      <Link style={{ color: "#64748B" }} to="/courses">
+      <Link style={{ color: "#F97316" }} to="/courses">
         Courses
       </Link>
+      <Link style={{ color: "#F97316", fontWeight: "bold" }} to="/enrollments">Enrollments</Link>
+      <Link style={{ color: "#F97316", fontWeight: "bold" }} to="/results">Results</Link>
     </div>
   );
 }
