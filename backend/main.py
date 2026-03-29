@@ -71,3 +71,55 @@ def search_student(name: str):
 def get_courses():
     db = SessionLocal()
     return db.query(Course).all()
+
+
+# ---------------- COURSES CRUD ----------------
+
+from pydantic import BaseModel
+
+class CourseCreate(BaseModel):
+    course_name: str
+    credits: int
+
+@app.post("/courses")
+def add_course(course: CourseCreate):
+    db = SessionLocal()
+    new_course = Course(
+        title=course.course_name,   # ✅ CORRECT FIELD
+        credits=course.credits
+    )
+    db.add(new_course)
+    db.commit()
+    return {"message": "Course added"}
+
+@app.delete("/courses/{id}")
+def delete_course(id: int):
+    db = SessionLocal()
+    course = db.query(Course).filter(Course.id == id).first()
+    if course:
+        db.delete(course)
+        db.commit()
+    return {"message": "Deleted"}
+
+
+from fastapi import Request
+from sqlalchemy import text
+
+@app.post("/query")
+async def run_query(request: Request):
+    db = SessionLocal()
+    body = await request.json()
+    query = body.get("query")
+
+    try:
+        result = db.execute(text(query))   # ✅ FIXED
+
+        if query.lower().startswith("select"):
+            rows = result.fetchall()
+            return [dict(row._mapping) for row in rows]
+
+        db.commit()
+        return {"message": "Query executed successfully"}
+
+    except Exception as e:
+        return {"error": str(e)}

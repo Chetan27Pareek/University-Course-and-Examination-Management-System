@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
 function Students() {
+  const [query, setQuery] = useState("");
+  const [result, setResult] = useState([]);
   const [students, setStudents] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -46,6 +48,19 @@ function Students() {
     const data = await res.json();
     setStudents(data);
   };
+
+  const runQuery = async () => {
+  const res = await fetch("http://127.0.0.1:8000/query", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ query })
+  });
+
+  const data = await res.json();
+  setResult(data);
+};
 
   const inputStyle = {
     padding: "10px",
@@ -146,6 +161,55 @@ function Students() {
           Reset
         </button>
       </div>
+
+      {/* QUERY BOX */}
+<div style={{
+  background: "white",
+  padding: "20px",
+  borderRadius: "12px",
+  marginTop: "20px",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.05)"
+}}>
+  <h3 style={{ color: "#F97316" }}>Run SQL Query</h3>
+
+  <textarea
+    rows="4"
+    placeholder="Write your SQL query here..."
+    value={query}
+    onChange={(e) => setQuery(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "10px",
+      border: "1px solid #E2E8F0",
+      borderRadius: "6px",
+      marginBottom: "10px"
+    }}
+  />
+
+  <button
+    style={{
+      background: "#F97316",
+      color: "white",
+      padding: "10px",
+      border: "none",
+      borderRadius: "6px"
+    }}
+    onClick={runQuery}
+  >
+    Run Query
+  </button>
+
+  {/* RESULT */}
+  <div style={{ marginTop: "15px" }}>
+    {Array.isArray(result) ? (
+      result.map((row, i) => (
+        <pre key={i}>{JSON.stringify(row, null, 2)}</pre>
+      ))
+    ) : (
+      <pre>{JSON.stringify(result, null, 2)}</pre>
+    )}
+  </div>
+</div>
 
       {/* LIST */}
       {students.length === 0 ? (
